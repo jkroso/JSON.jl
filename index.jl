@@ -1,5 +1,4 @@
 import Base.writemime
-export JSON
 
 typealias JSON MIME"application/json"
 
@@ -7,9 +6,6 @@ typealias JSON MIME"application/json"
 # Serialize `data` as a JSON String
 #
 JSON(data) = sprint(writemime, "application/json", data)
-
-# Write data to `io` as a JSON String
-# -----------------------------------
 
 function writemime(io::IO, ::JSON, dict::Dict)
   write(io, '{')
