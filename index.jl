@@ -6,11 +6,7 @@ typealias JSON MIME"application/json"
 ##
 # Serialize `data` as a JSON String
 #
-function JSON(data)
-  io = IOBuffer()
-  writemime(io, "application/json", data)
-  takebuf_string(io)
-end
+JSON(data) = sprint(writemime, "application/json", data)
 
 # Write data to `io` as a JSON String
 # -----------------------------------
