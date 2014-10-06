@@ -30,7 +30,14 @@ function writemime(io::IO, ::JSON, array::Array)
   write(io, ']')
 end
 
-writemime(io::IO, ::JSON, s::String) = write(io, '"', s, '"')
-writemime(io::IO, ::JSON, n::Int) = write(io, string(n))
-writemime(io::IO, ::JSON, n::FloatingPoint) = write(io, string(n))
+function writemime(io::IO, ::JSON, s::String)
+  write(io, '"')
+  for c in s
+    c === '"' && write(io, '\\')
+    write(io, c)
+  end
+  write(io, '"')
+end
+
+writemime(io::IO, ::JSON, n::Real) = write(io, string(n))
 writemime(io::IO, ::JSON, b::Bool) = write(io, string(b))
