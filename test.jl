@@ -9,4 +9,5 @@
 suite("strings") do
   @test [JSON("a")...] == ['"', 'a', '"']
   @test [JSON("\"")...] == ['"', '\\', '"', '"']
+  @test [JSON("\n")...] == ['"', '\\', 'n', '"']
 end

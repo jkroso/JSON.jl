@@ -32,10 +32,7 @@ end
 
 function writemime(io::IO, ::JSON, s::String)
   write(io, '"')
-  for c in s
-    c === '"' && write(io, '\\')
-    write(io, c)
-  end
+  print_escaped(io, s, "\"")
   write(io, '"')
 end
 
