@@ -1,13 +1,6 @@
-import Base.writemime
-
 typealias JSON MIME"application/json"
 
-##
-# Serialize `data` as a JSON String
-#
-JSON(data) = sprint(writemime, "application/json", data)
-
-function writemime(io::IO, ::JSON, dict::Dict)
+function Base.writemime(io::IO, ::JSON, dict::Dict)
   write(io, '{')
   items = collect(dict)
   for (key,value) in items[1:end-1]
@@ -20,7 +13,7 @@ function writemime(io::IO, ::JSON, dict::Dict)
   write(io, '}')
 end
 
-function writemime(io::IO, ::JSON, array::Array)
+function Base.writemime(io::IO, ::JSON, array::Array)
   write(io, '[')
   for value in array[1:end-1]
     writemime(io, "application/json", value)
@@ -30,11 +23,11 @@ function writemime(io::IO, ::JSON, array::Array)
   write(io, ']')
 end
 
-function writemime(io::IO, ::JSON, s::String)
+function Base.writemime(io::IO, ::JSON, s::String)
   write(io, '"')
   print_escaped(io, s, "\"")
   write(io, '"')
 end
 
-writemime(io::IO, ::JSON, n::Real) = write(io, string(n))
-writemime(io::IO, ::JSON, b::Bool) = write(io, string(b))
+Base.writemime(io::IO, ::JSON, n::Real) = write(io, string(n))
+Base.writemime(io::IO, ::JSON, b::Bool) = write(io, string(b))
