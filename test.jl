@@ -14,6 +14,8 @@ end
 @test serialize(["a"=>1]) == """{"a":1}"""
 @test serialize([1]) == "[1]"
 @test serialize(1.0) == "1.0"
+@test serialize([]) == "[]"
+@test serialize(Dict()) == "{}"
 
 suite("strings") do
   @test [serialize("a")...] == ['"', 'a', '"']
