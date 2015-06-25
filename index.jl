@@ -25,6 +25,12 @@ test("Strings") do
   @test json("\n") == "\"\\n\""
 end
 
+Base.writemime(io::IO, m::M, s::Symbol) = writemime(io, m, string(s))
+
+test("Symbols") do
+  @test json(:a) == "\"a\""
+end
+
 function Base.writemime(io::IO, m::M, dict::Dict)
   write(io, '{')
   items = collect(dict)
