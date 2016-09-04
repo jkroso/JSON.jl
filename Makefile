@@ -1,4 +1,4 @@
-test: dependencies
-	@jest index.jl
+test:
+	@jest test.jl
 
 .PHONY: test
