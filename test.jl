@@ -23,8 +23,12 @@ test("Dict") do
   @test json(Dict("a"=>1)) == """{"a":1}"""
 end
 
-test("Array") do
+test("Vector") do
   @test json([1,true,"3"]) == """[1,true,"3"]"""
   @test json([1]) == "[1]"
   @test json([]) == "[]"
+end
+
+test("Set") do
+  @test json(Set([1])) == "[1]"
 end
