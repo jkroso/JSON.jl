@@ -5,6 +5,7 @@ json(value) = sprint(writemime, M(), value)
 Base.writemime(io::IO, ::M, n::Real) = write(io, string(n))
 Base.writemime(io::IO, ::M, b::Bool) = write(io, string(b))
 Base.writemime(io::IO, ::M, ::Void) = write(io, "null")
+Base.writemime(io::IO, m::M, n::Nullable) = isnull(n) ? write(io, "null") : writemime(io, m, get(n))
 
 function Base.writemime(io::IO, ::M, s::AbstractString)
   write(io, '"')

@@ -36,3 +36,8 @@ end
 test("Pair") do
   @test json(:a=>1) == "[\"a\",1]"
 end
+
+test("Nullable") do
+  @test json(Nullable()) == "null"
+  @test json(Nullable(1)) == "1"
+end
