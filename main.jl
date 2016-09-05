@@ -29,7 +29,7 @@ function Base.writemime(io::IO, m::M, dict::Associative)
   write(io, '}')
 end
 
-function Base.writemime(io::IO, m::M, arraylike::Union{Set,Vector})
+function Base.writemime(io::IO, m::M, arraylike::Union{Set,Vector,Pair})
   write(io, '[')
   first = true
   for value in arraylike

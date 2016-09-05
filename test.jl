@@ -32,3 +32,7 @@ end
 test("Set") do
   @test json(Set([1])) == "[1]"
 end
+
+test("Pair") do
+  @test json(:a=>1) == "[\"a\",1]"
+end
