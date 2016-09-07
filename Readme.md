@@ -17,6 +17,12 @@ Returns a JSON `String` representation of `data`
 json([1,"two", true]) # => """[1,"two",true]"""
 ```
 
-### `writemime(io::IO, ::MIME"application/json", data::Any)`
+Alternatively you can use
 
-Write the JSON representation of `data` to `io`. This is used internally by `json()` and is the function you should extend if you want to define serializations for new data types
+```julia
+stringmime("application/json", [1, "two", true]) # => """[1,"two",true]"""
+```
+
+### `show(io::IO, ::MIME"application/json", data::Any)`
+
+Write the JSON representation of `data` to `io`

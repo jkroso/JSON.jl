@@ -1,21 +1,15 @@
 typealias M MIME"application/json"
 
-json(value) = sprint(writemime, M(), value)
+json(value) = sprint(show, M(), value)
 
-Base.writemime(io::IO, ::M, n::Real) = write(io, string(n))
-Base.writemime(io::IO, ::M, b::Bool) = write(io, string(b))
-Base.writemime(io::IO, ::M, ::Void) = write(io, "null")
-Base.writemime(io::IO, m::M, n::Nullable) = isnull(n) ? write(io, "null") : writemime(io, m, get(n))
+Base.show(io::IO, ::M, s::AbstractString) = (write(io, '"'); escape_string(io, s, "\""); write(io, '"'))
+Base.show(io::IO, m::M, s::Symbol) = show(io, m, string(s))
+Base.show(io::IO, ::M, n::Real) = show(io, n)
+Base.show(io::IO, ::M, b::Bool) = show(io, b)
+Base.show(io::IO, ::M, ::Void) = write(io, "null")
+Base.show(io::IO, m::M, n::Nullable) = isnull(n) ? write(io, "null") : show(io, m, get(n))
 
-function Base.writemime(io::IO, ::M, s::AbstractString)
-  write(io, '"')
-  print_escaped(io, s, "\"")
-  write(io, '"')
-end
-
-Base.writemime(io::IO, m::M, s::Symbol) = writemime(io, m, string(s))
-
-function Base.writemime(io::IO, m::M, dict::Associative)
+Base.show(io::IO, m::M, dict::Associative) = begin
   write(io, '{')
   first = true
   for (key,value) in dict
@@ -25,12 +19,12 @@ function Base.writemime(io::IO, m::M, dict::Associative)
       write(io, ',')
     end
     write(io, "\"$key\":")
-    writemime(io, m, value)
+    show(io, m, value)
   end
   write(io, '}')
 end
 
-function Base.writemime(io::IO, m::M, arraylike::Union{Set,Vector,Pair})
+Base.show(io::IO, m::M, arraylike::Union{Set,Vector,Pair}) = begin
   write(io, '[')
   first = true
   for value in arraylike
@@ -39,7 +33,7 @@ function Base.writemime(io::IO, m::M, arraylike::Union{Set,Vector,Pair})
     else
       write(io, ',')
     end
-    writemime(io, m, value)
+    show(io, m, value)
   end
   write(io, ']')
 end
