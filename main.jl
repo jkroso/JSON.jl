@@ -4,7 +4,7 @@ json(value) = sprint(show, M(), value)
 
 Base.show(io::IO, ::M, s::AbstractString) = (write(io, '"'); escape_string(io, s, "\""); write(io, '"'))
 Base.show(io::IO, m::M, s::Symbol) = show(io, m, string(s))
-Base.show(io::IO, ::M, n::Real) = show(io, n)
+Base.show(io::IO, ::M, n::Real) = print(io, n)
 Base.show(io::IO, ::M, b::Bool) = show(io, b)
 Base.show(io::IO, ::M, ::Void) = write(io, "null")
 Base.show(io::IO, m::M, n::Nullable) = isnull(n) ? write(io, "null") : show(io, m, get(n))
