@@ -1,43 +1,45 @@
 @require "." json
+using Base.Test
 
-test("Primitives") do
+@testset "Primitives" begin
   @test json(1.0) == "1.0"
+  @test json(UInt8(1)) == "1"
   @test json(nothing) == "null"
   @test json(false) == "false"
   @test json(true) == "true"
 end
 
-test("Strings") do
+@testset "Strings" begin
   @test json("a") == "\"a\""
   @test json("\"") == "\"\\\"\""
   @test json("\n") == "\"\\n\""
 end
 
-test("Symbols") do
+@testset "Symbols" begin
   @test json(:a) == "\"a\""
 end
 
-test("Dict") do
+@testset "Dict" begin
   @test json(Dict("a"=>1,"b"=>2)) == """{"b":2,"a":1}"""
   @test json(Dict()) == "{}"
   @test json(Dict("a"=>1)) == """{"a":1}"""
 end
 
-test("Vector") do
+@testset "Vector" begin
   @test json([1,true,"3"]) == """[1,true,"3"]"""
   @test json([1]) == "[1]"
   @test json([]) == "[]"
 end
 
-test("Set") do
+@testset "Set" begin
   @test json(Set([1])) == "[1]"
 end
 
-test("Pair") do
+@testset "Pair" begin
   @test json(:a=>1) == "[\"a\",1]"
 end
 
-test("Nullable") do
+@testset "Nullable" begin
   @test json(Nullable()) == "null"
   @test json(Nullable(1)) == "1"
 end

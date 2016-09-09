@@ -1,4 +1,4 @@
 test:
-	@jest test.jl
+	@julia test.jl
 
 .PHONY: test
