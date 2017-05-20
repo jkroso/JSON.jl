@@ -1,4 +1,4 @@
-typealias M MIME"application/json"
+const M = MIME"application/json"
 
 json(value) = sprint(show, M(), value)
 
