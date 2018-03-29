@@ -1,8 +1,17 @@
+import JSON.Common: STRING_DELIM, ESCAPED_ARRAY
+
 const M = MIME"application/json"
 
 json(value) = sprint(show, M(), value)
 
-Base.show(io::IO, ::M, s::AbstractString) = (write(io, '"'); escape_string(io, s, "\""); write(io, '"'))
+Base.show(io::IO, ::M, s::AbstractString) = begin
+  write(io, STRING_DELIM)
+  for byte in Vector{UInt8}(s)
+    write(io, ESCAPED_ARRAY[byte + 0x01])
+  end
+  write(io, STRING_DELIM)
+end
+
 Base.show(io::IO, m::M, s::Symbol) = show(io, m, string(s))
 Base.show(io::IO, ::M, n::Real) = print(io, n)
 Base.show(io::IO, ::M, b::Bool) = show(io, b)

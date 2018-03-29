@@ -13,6 +13,7 @@ end
   @test json("a") == "\"a\""
   @test json("\"") == "\"\\\"\""
   @test json("\n") == "\"\\n\""
+  @test json("\e") == "\"\\u001b\""
 end
 
 @testset "Symbols" begin
