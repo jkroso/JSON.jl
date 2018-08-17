@@ -1,24 +1,23 @@
-import JSON.Common: STRING_DELIM, ESCAPED_ARRAY
+@require "github.com/JuliaIO/JSON.jl" Common
 
 const M = MIME"application/json"
 
 json(value) = sprint(show, M(), value)
 
 Base.show(io::IO, ::M, s::AbstractString) = begin
-  write(io, STRING_DELIM)
-  for byte in Vector{UInt8}(s)
-    write(io, ESCAPED_ARRAY[byte + 0x01])
+  write(io, Common.STRING_DELIM)
+  for byte in codeunits(s)
+    write(io, Common.ESCAPED_ARRAY[byte + 0x01])
   end
-  write(io, STRING_DELIM)
+  write(io, Common.STRING_DELIM)
 end
 
 Base.show(io::IO, m::M, s::Symbol) = show(io, m, string(s))
 Base.show(io::IO, ::M, n::Real) = print(io, n)
 Base.show(io::IO, ::M, b::Bool) = show(io, b)
-Base.show(io::IO, ::M, ::Void) = write(io, "null")
-Base.show(io::IO, m::M, n::Nullable) = isnull(n) ? write(io, "null") : show(io, m, get(n))
+Base.show(io::IO, ::M, ::Nothing) = write(io, "null")
 
-Base.show(io::IO, m::M, dict::Associative) = begin
+Base.show(io::IO, m::M, dict::AbstractDict) = begin
   write(io, '{')
   first = true
   for (key,value) in dict

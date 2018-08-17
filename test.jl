@@ -1,5 +1,5 @@
 @require "." json
-using Base.Test
+using Test
 
 @testset "Primitives" begin
   @test json(1.0) == "1.0"
@@ -38,9 +38,4 @@ end
 
 @testset "Pair" begin
   @test json(:a=>1) == "[\"a\",1]"
-end
-
-@testset "Nullable" begin
-  @test json(Nullable()) == "null"
-  @test json(Nullable(1)) == "1"
 end
