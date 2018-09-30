@@ -26,6 +26,10 @@ end
   @test json(Dict("a"=>1)) == """{"a":1}"""
 end
 
+@testset "NamedTuple" begin
+  @test json((a=1,b=2)) == """{"a":1,"b":2}"""
+end
+
 @testset "Vector" begin
   @test json([1,true,"3"]) == """[1,true,"3"]"""
   @test json([1]) == "[1]"

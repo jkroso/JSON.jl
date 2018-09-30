@@ -17,6 +17,7 @@ Base.show(io::IO, ::M, n::Real) = print(io, n)
 Base.show(io::IO, ::M, b::Bool) = show(io, b)
 Base.show(io::IO, ::M, ::Nothing) = write(io, "null")
 
+Base.show(io::IO, m::M, nt::NamedTuple) = invoke(show, Tuple{IO,M,AbstractDict}, io, m, pairs(nt))
 Base.show(io::IO, m::M, dict::AbstractDict) = begin
   write(io, '{')
   first = true
