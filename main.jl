@@ -39,9 +39,11 @@ end
 
 const JSON = MIME"application/json"
 
-json(value) = sprint(show, JSON(), value)
+Base.show(io::IO, ::JSON, x) = json(io, x)
 
-Base.show(io::IO, ::JSON, s::AbstractString) = begin
+json(value) = sprint(json, value)
+
+json(io::IO, s::AbstractString) = begin
   write(io, '"')
   for byte in codeunits(s)
     write(io, ESCAPED_ARRAY[byte + 0x01])
@@ -49,13 +51,13 @@ Base.show(io::IO, ::JSON, s::AbstractString) = begin
   write(io, '"')
 end
 
-Base.show(io::IO, m::JSON, s::Symbol) = show(io, m, string(s))
-Base.show(io::IO, ::JSON, n::Real) = print(io, n)
-Base.show(io::IO, ::JSON, b::Bool) = show(io, b)
-Base.show(io::IO, ::JSON, ::Nothing) = write(io, "null")
+json(io::IO, s::Symbol) = json(io, string(s))
+json(io::IO, n::Real) = print(io, n)
+json(io::IO, b::Bool) = show(io, b)
+json(io::IO, ::Nothing) = write(io, "null")
 
-Base.show(io::IO, m::JSON, nt::NamedTuple) = invoke(show, Tuple{IO,M,AbstractDict}, io, m, pairs(nt))
-Base.show(io::IO, m::JSON, dict::AbstractDict) = begin
+json(io::IO, nt::NamedTuple) = invoke(json, Tuple{IO,AbstractDict}, io, pairs(nt))
+json(io::IO, dict::AbstractDict) = begin
   write(io, '{')
   first = true
   for (key,value) in dict
@@ -65,12 +67,12 @@ Base.show(io::IO, m::JSON, dict::AbstractDict) = begin
       write(io, ',')
     end
     write(io, "\"$key\":")
-    show(io, m, value)
+    json(io, value)
   end
   write(io, '}')
 end
 
-Base.show(io::IO, m::JSON, arraylike::Union{AbstractSet,AbstractVector,Pair,Tuple}) = begin
+json(io::IO, arraylike::Union{AbstractSet,AbstractVector,Pair,Tuple}) = begin
   write(io, '[')
   first = true
   for value in arraylike
@@ -79,7 +81,7 @@ Base.show(io::IO, m::JSON, arraylike::Union{AbstractSet,AbstractVector,Pair,Tupl
     else
       write(io, ',')
     end
-    show(io, m, value)
+    json(io, value)
   end
   write(io, ']')
 end
