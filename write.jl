@@ -67,7 +67,7 @@ json(io::IO, dict::AbstractDict) = begin
       write(io, ',')
     end
     write(io, "\"$key\":")
-    json(io, value)
+    show(io, JSON(), value)
   end
   write(io, '}')
 end
@@ -81,7 +81,7 @@ json(io::IO, arraylike::Union{AbstractSet,AbstractVector,Pair,Tuple}) = begin
     else
       write(io, ',')
     end
-    json(io, value)
+    show(io, JSON(), value)
   end
   write(io, ']')
 end
