@@ -37,11 +37,11 @@ let LATIN_U = UInt8('u')
   end
 end
 
-const M = MIME"application/json"
+const JSON = MIME"application/json"
 
-json(value) = sprint(show, M(), value)
+json(value) = sprint(show, JSON(), value)
 
-Base.show(io::IO, ::M, s::AbstractString) = begin
+Base.show(io::IO, ::JSON, s::AbstractString) = begin
   write(io, '"')
   for byte in codeunits(s)
     write(io, ESCAPED_ARRAY[byte + 0x01])
@@ -49,13 +49,13 @@ Base.show(io::IO, ::M, s::AbstractString) = begin
   write(io, '"')
 end
 
-Base.show(io::IO, m::M, s::Symbol) = show(io, m, string(s))
-Base.show(io::IO, ::M, n::Real) = print(io, n)
-Base.show(io::IO, ::M, b::Bool) = show(io, b)
-Base.show(io::IO, ::M, ::Nothing) = write(io, "null")
+Base.show(io::IO, m::JSON, s::Symbol) = show(io, m, string(s))
+Base.show(io::IO, ::JSON, n::Real) = print(io, n)
+Base.show(io::IO, ::JSON, b::Bool) = show(io, b)
+Base.show(io::IO, ::JSON, ::Nothing) = write(io, "null")
 
-Base.show(io::IO, m::M, nt::NamedTuple) = invoke(show, Tuple{IO,M,AbstractDict}, io, m, pairs(nt))
-Base.show(io::IO, m::M, dict::AbstractDict) = begin
+Base.show(io::IO, m::JSON, nt::NamedTuple) = invoke(show, Tuple{IO,M,AbstractDict}, io, m, pairs(nt))
+Base.show(io::IO, m::JSON, dict::AbstractDict) = begin
   write(io, '{')
   first = true
   for (key,value) in dict
@@ -70,7 +70,7 @@ Base.show(io::IO, m::M, dict::AbstractDict) = begin
   write(io, '}')
 end
 
-Base.show(io::IO, m::M, arraylike::Union{AbstractSet,AbstractVector,Pair,Tuple}) = begin
+Base.show(io::IO, m::JSON, arraylike::Union{AbstractSet,AbstractVector,Pair,Tuple}) = begin
   write(io, '[')
   first = true
   for value in arraylike
