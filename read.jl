@@ -1,4 +1,4 @@
-@use "github.com/jkroso/AsyncBuffer.jl" pipe Buffer AsyncBuffer
+@use BufferedStreams: BufferedInputStream
 
 const whitespace = " \t\n\r"
 const digits = "0123456789+-"
@@ -11,7 +11,6 @@ skipwhitespace(io::IO) = begin
   end
 end
 
-parse_json(json::AbstractString) = parse_json(IOBuffer(json))
 parse_json(io::IO, c::Char=skipwhitespace(io)) = begin
   if     c == '"' parse_string(io)
   elseif c == '{' parse_dict(io)
@@ -89,7 +88,9 @@ parse_dict(io::IO) = begin
   end
 end
 
-goodIO(io::IO) = pipe(io, Buffer())
-goodIO(io::Union{IOBuffer,AsyncBuffer}) = io
-goodIO(x::Any) = IOBuffer(x)
+parse_json(json::Union{AbstractString,Vector{UInt8}}) = parse_json(IOBuffer(json))
+
+goodIO(io::IO) = hasmethod(position, Tuple{typeof(io)}) ? io : BufferedInputStream(io)
+goodIO(x::Any) = BufferedInputStream(x)
+
 Base.parse(::MIME"application/json", data::Any) = parse_json(goodIO(data))
