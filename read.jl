@@ -1,17 +1,15 @@
-@use BufferedStreams: BufferedInputStream
+@use "github.com/jkroso/Buffer.jl/ReadBuffer.jl" buffer
 
-const whitespace = " \t\n\r"
 const digits = "0123456789+-"
 isdigit(n::Char) = n in digits
 
-skipwhitespace(io::IO) = begin
-  while true
-    c = read(io, Char)
-    c in whitespace || return c
+nextchar(io::IO) = begin
+  for c in readeach(io, Char)
+    isspace(c) || return c
   end
 end
 
-parse_json(io::IO, c::Char=skipwhitespace(io)) = begin
+parse_json(io::IO, c::Char=nextchar(io)) = begin
   if     c == '"' parse_string(io)
   elseif c == '{' parse_dict(io)
   elseif c == '[' parse_vec(io)
@@ -24,12 +22,11 @@ end
 
 parse_number(c::Char, io::IO) = begin
   buf = Char[c]
-  while !eof(io)
-    c = read(io, Char)
+  for c in readeach(io, Char)
     if c == '.'
       @assert '.' ∉ buf "malformed number"
     elseif !isdigit(c)
-      skip(io, -1)
+      skip(io, -ncodeunits(c))
       break
     end
     push!(buf, c)
@@ -39,8 +36,7 @@ end
 
 parse_string(io::IO) = begin
   buf = IOBuffer()
-  while true
-    c = read(io, Char)
+  for c in readeach(io, Char)
     c == '"' && return String(take!(buf))
     if c == '\\'
       c = read(io, Char)
@@ -62,12 +58,11 @@ end
 
 parse_vec(io::IO) = begin
   vec = Any[]
-  while true
-    c = read(io, Char)
+  for c in readeach(io, Char)
     c == ']' && return vec
-    c in whitespace && continue
+    isspace(c) && continue
     push!(vec, parse_json(io, c))
-    c = skipwhitespace(io)
+    c = nextchar(io)
     c == ']' && return vec
     @assert c == ',' "missing comma"
   end
@@ -75,14 +70,14 @@ end
 
 parse_dict(io::IO) = begin
   dict = Dict{AbstractString,Any}()
-  while true
-    c = skipwhitespace(io)
+  for c in readeach(io, Char)
+    isspace(c) && continue
     c == '}' && return dict
     @assert c == '"' "dictionary keys must be strings"
     key = parse_string(io)
-    @assert skipwhitespace(io) == ':' "missing semi-colon"
+    @assert nextchar(io) == ':' "missing semi-colon"
     dict[key] = parse_json(io)
-    c = skipwhitespace(io)
+    c = nextchar(io)
     c == '}' && return dict
     @assert c == ',' "missing comma"
   end
@@ -90,7 +85,4 @@ end
 
 parse_json(json::Union{AbstractString,Vector{UInt8}}) = parse_json(IOBuffer(json))
 
-goodIO(io::IO) = hasmethod(position, Tuple{typeof(io)}) ? io : BufferedInputStream(io)
-goodIO(x::Any) = BufferedInputStream(x)
-
-Base.parse(::MIME"application/json", data::Any) = parse_json(goodIO(data))
+Base.parse(::MIME"application/json", data::Any) = parse_json(buffer(data))
