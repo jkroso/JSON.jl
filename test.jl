@@ -1,6 +1,7 @@
 @use "./write.jl" json
 @use "./read.jl" parse_json
 using Test
+using Dates
 
 @testset "write" begin
   @testset "Primitives" begin
@@ -36,6 +37,13 @@ using Test
     @test json([1,true,"3"]) == """[1,true,"3"]"""
     @test json([1]) == "[1]"
     @test json([]) == "[]"
+  end
+
+  @testset "DateTime" begin
+    t = DateTime(2026, 3, 9, 9, 37, 32, 251)
+    result = parse_json(json(Dict("time" => t, "content" => "a")))
+    @test result["content"] == "a"
+    @test result["time"] == "2026-03-09T09:37:32.251"
   end
 
   @testset "Set" begin

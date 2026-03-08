@@ -51,6 +51,7 @@ json(io::IO, s::AbstractString) = begin
   write(io, '"')
 end
 
+json(io::IO, x) = json(io, string(x))
 json(io::IO, s::Symbol) = json(io, string(s))
 json(io::IO, n::Real) = print(io, n)
 json(io::IO, b::Bool) = show(io, b)
