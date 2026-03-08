@@ -80,6 +80,7 @@ end
     @test parse_json("[1]") == Any[1]
     @test parse_json("[1,2]") == Any[1,2]
     @test parse_json("[ 1, 2 ]") == Any[1,2]
+    @test parse_json("[1, 2]", Vector{Float64}) isa Vector{Float64}
   end
 
   @testset "Dict" begin

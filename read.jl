@@ -9,7 +9,7 @@ nextchar(io::IO) = begin
   end
 end
 
-parse_json(io::IO, c::Char=nextchar(io)) = begin
+parse_any(io::IO, c::Char=nextchar(io)) = begin
   if     c == '"' parse_string(io)
   elseif c == '{' parse_dict(io)
   elseif c == '[' parse_vec(io)
@@ -61,7 +61,7 @@ parse_vec(io::IO) = begin
   for c in readeach(io, Char)
     c == ']' && return vec
     isspace(c) && continue
-    push!(vec, parse_json(io, c))
+    push!(vec, parse_any(io, c))
     c = nextchar(io)
     c == ']' && return vec
     @assert c == ',' "missing comma"
@@ -76,13 +76,16 @@ parse_dict(io::IO) = begin
     @assert c == '"' "dictionary keys must be strings"
     key = parse_string(io)
     @assert nextchar(io) == ':' "missing semi-colon"
-    dict[key] = parse_json(io)
+    dict[key] = parse_any(io)
     c = nextchar(io)
     c == '}' && return dict
     @assert c == ',' "missing comma"
   end
 end
 
-parse_json(json::Union{AbstractString,Vector{UInt8}}) = parse_json(IOBuffer(json))
+parse_any(json::Union{AbstractString,Vector{UInt8}}) = parse_any(IOBuffer(json))
 
-Base.parse(::MIME"application/json", data::Any) = parse_json(buffer(data))
+Base.parse(::MIME"application/json", data::Any) = parse_json(data)
+
+parse_json(data) = parse_any(buffer(data))
+parse_json(data, T) = convert(T, parse_any(data))
