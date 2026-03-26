@@ -67,6 +67,11 @@ end
     @test parse_json("+1") == 1
     @test parse_json("-1") == -1
     @test parse_json("1.0") == 1.0
+    @test parse_json("7.5e-7") ≈ 7.5e-7
+    @test parse_json("1e10") ≈ 1e10
+    @test parse_json("2.5E+3") ≈ 2.5e3
+    @test parse_json("1e-2") ≈ 0.01
+    @test parse_json("{\"v\":7.5e-7}")["v"] ≈ 7.5e-7
   end
 
   @testset "strings" begin

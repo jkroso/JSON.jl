@@ -25,6 +25,15 @@ parse_number(c::Char, io::IO) = begin
   for c in readeach(io, Char)
     if c == '.'
       @assert '.' ∉ buf "malformed number"
+    elseif c == 'e' || c == 'E'
+      push!(buf, c)
+      c = read(io, Char)
+      if c == '+' || c == '-'
+        push!(buf, c)
+      else
+        skip(io, -ncodeunits(c))
+      end
+      continue
     elseif !isdigit(c)
       skip(io, -ncodeunits(c))
       break
