@@ -101,3 +101,10 @@ parse_json(data) = parse_any(buffer(data))
 parse_json(data::IO, ::Type{T}) where T = convert(T, parse_json(data))
 parse_json(data, ::Type{T}) where T = convert(T, parse_json(data))
 parse_json(data, ::Type{T}) where T<:Union{Date,DateTime} = T(parse_json(data))
+parse_json(data, ::Type{Symbol}) = Symbol(parse_json(data))
+parse_json(data, ::Type{T}) where T<:Tuple = T(parse_json(data))
+parse_json(data, ::Type{Set{T}}) where T = Set{T}(parse_json(data))
+parse_json(data, ::Type{NamedTuple{names,T}}) where {names,T} = begin
+  d = parse_json(data)
+  NamedTuple{names,T}(Tuple(d[String(k)] for k in names))
+end

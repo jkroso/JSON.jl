@@ -109,4 +109,23 @@ end
     @test parse_json("\"2026-03-09T09:37:32.251\"", DateTime) == DateTime(2026, 3, 9, 9, 37, 32, 251)
     @test parse_json("\"2026-03-09T09:37:32.251\"", DateTime) isa DateTime
   end
+
+  @testset "Symbol" begin
+    @test parse_json("\"hello\"", Symbol) === :hello
+  end
+
+  @testset "Tuple" begin
+    @test parse_json("[1,2,3]", Tuple{Float32,Float32,Float32}) === (Float32(1), Float32(2), Float32(3))
+    @test parse_json("[1,\"a\"]", Tuple{Int,String}) === (1, "a")
+  end
+
+  @testset "Set" begin
+    @test parse_json("[1,2,3]", Set{Float32}) == Set{Float32}([1,2,3])
+    @test parse_json("[1,2,3]", Set{Float32}) isa Set{Float32}
+  end
+
+  @testset "NamedTuple" begin
+    @test parse_json("{\"a\":1,\"b\":2}", NamedTuple{(:a,:b),Tuple{Int,Int}}) === (a=1, b=2)
+    @test parse_json("{\"x\":\"hi\"}", NamedTuple{(:x,),Tuple{String}}) === (x="hi",)
+  end
 end
