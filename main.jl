@@ -1,4 +1,4 @@
 @use "./read" parse_json
-@use "./write" json JSON
+@use "./write" write_json json JSON
 
-export JSON, parse_json, json
+export JSON, parse_json, write_json, json
