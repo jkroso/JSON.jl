@@ -44,3 +44,11 @@ or
 ```julia
 parse(MIME("application/json"), "{\"a\":1}")
 ```
+
+### `parse_json(data, ::Type{T})`
+
+Parses JSON then converts the result to `T`. By default this just calls `parse_json(data)` and then `convert`s, but specialized methods can parse directly into `T` if they wish.
+
+```julia
+parse_json("{\"a\":1}", Dict{String,Int}) # => Dict{String,Int}("a" => 1)
+```

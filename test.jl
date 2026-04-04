@@ -1,57 +1,57 @@
-@use "./write.jl" json
+@use "./write.jl" write_json
 @use "./read.jl" parse_json
-using Test
-using Dates
+@use Dates...
+@use Test...
 
 @testset "write" begin
   @testset "Primitives" begin
-    @test json(1.0) == "1.0"
-    @test json(UInt8(1)) == "1"
-    @test json(nothing) == "null"
-    @test json(false) == "false"
-    @test json(true) == "true"
+    @test write_json(1.0) == "1.0"
+    @test write_json(UInt8(1)) == "1"
+    @test write_json(nothing) == "null"
+    @test write_json(false) == "false"
+    @test write_json(true) == "true"
   end
 
   @testset "Strings" begin
-    @test json("a") == "\"a\""
-    @test json("\"") == "\"\\\"\""
-    @test json("\n") == "\"\\n\""
-    @test json("\e") == "\"\\u001b\""
+    @test write_json("a") == "\"a\""
+    @test write_json("\"") == "\"\\\"\""
+    @test write_json("\n") == "\"\\n\""
+    @test write_json("\e") == "\"\\u001b\""
   end
 
   @testset "Symbols" begin
-    @test json(:a) == "\"a\""
+    @test write_json(:a) == "\"a\""
   end
 
   @testset "Dict" begin
-    @test json(Dict("a"=>1,"b"=>2)) == """{"b":2,"a":1}"""
-    @test json(Dict()) == "{}"
-    @test json(Dict("a"=>1)) == """{"a":1}"""
+    @test parse_json(write_json(Dict("a"=>1,"b"=>2))) == Dict("a"=>1,"b"=>2)
+    @test write_json(Dict()) == "{}"
+    @test write_json(Dict("a"=>1)) == """{"a":1}"""
   end
 
   @testset "NamedTuple" begin
-    @test json((a=1,b=2)) == """{"a":1,"b":2}"""
+    @test write_json((a=1,b=2)) == """{"a":1,"b":2}"""
   end
 
   @testset "Vector" begin
-    @test json([1,true,"3"]) == """[1,true,"3"]"""
-    @test json([1]) == "[1]"
-    @test json([]) == "[]"
+    @test write_json([1,true,"3"]) == """[1,true,"3"]"""
+    @test write_json([1]) == "[1]"
+    @test write_json([]) == "[]"
   end
 
   @testset "DateTime" begin
     t = DateTime(2026, 3, 9, 9, 37, 32, 251)
-    result = parse_json(json(Dict("time" => t, "content" => "a")))
+    result = parse_json(write_json(Dict("time" => t, "content" => "a")))
     @test result["content"] == "a"
     @test result["time"] == "2026-03-09T09:37:32.251"
   end
 
   @testset "Set" begin
-    @test json(Set([1])) == "[1]"
+    @test write_json(Set([1])) == "[1]"
   end
 
   @testset "Pair" begin
-    @test json(:a=>1) == "[\"a\",1]"
+    @test write_json(:a=>1) == "[\"a\",1]"
   end
 end
 
@@ -91,5 +91,22 @@ end
   @testset "Dict" begin
     @test parse_json("{}") == Dict{AbstractString,Any}()
     @test parse_json("{\"a\":1}") == Dict{AbstractString,Any}("a"=>1)
+  end
+
+  @testset "parse_json(data, T)" begin
+    @test parse_json("{\"a\":1}", Dict{String,Float64}) == Dict("a"=>1.0)
+    @test parse_json("{\"a\":1}", Dict{String,Float64}) isa Dict{String,Float64}
+    @test parse_json("[1,2,3]", Vector{Float32}) == Float32[1,2,3]
+    @test parse_json("1.5", Float64) === Float64(1.5)
+    @test parse_json("1", Int) === 1
+    @test parse_json(IOBuffer("{\"a\":1}"), Dict{String,Int}) == Dict("a"=>1)
+  end
+
+  @testset "Date/DateTime" begin
+    @test parse_json("\"2026-03-09\"", Date) == Date(2026, 3, 9)
+    @test parse_json("\"2026-03-09\"", Date) isa Date
+    @test parse_json("\"2026-03-09T09:37:32\"", DateTime) == DateTime(2026, 3, 9, 9, 37, 32)
+    @test parse_json("\"2026-03-09T09:37:32.251\"", DateTime) == DateTime(2026, 3, 9, 9, 37, 32, 251)
+    @test parse_json("\"2026-03-09T09:37:32.251\"", DateTime) isa DateTime
   end
 end

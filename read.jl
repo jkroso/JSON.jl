@@ -1,4 +1,5 @@
 @use "github.com/jkroso/Buffer.jl/ReadBuffer.jl" buffer
+@use Dates: Date, DateTime
 
 const digits = "0123456789+-"
 isdigit(n::Char) = n in digits
@@ -97,4 +98,6 @@ parse_any(json::Union{AbstractString,Vector{UInt8}}) = parse_any(IOBuffer(json))
 Base.parse(::MIME"application/json", data::Any) = parse_json(data)
 
 parse_json(data) = parse_any(buffer(data))
-parse_json(data, T) = convert(T, parse_any(data))
+parse_json(data::IO, ::Type{T}) where T = convert(T, parse_json(data))
+parse_json(data, ::Type{T}) where T = convert(T, parse_json(data))
+parse_json(data, ::Type{T}) where T<:Union{Date,DateTime} = T(parse_json(data))
