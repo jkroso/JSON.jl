@@ -41,7 +41,10 @@ parse_number(c::Char, io::IO) = begin
     end
     push!(buf, c)
   end
-  Base.parse(Float32, String(buf))
+  # Float64, not Float32: Float32's 24-bit mantissa silently corrupts numbers
+  # beyond ~7 significant digits — money amounts lose cents above ~$131k and
+  # integer ids drift above 2^24. Float64 keeps integers exact to 2^53.
+  Base.parse(Float64, String(buf))
 end
 
 parse_string(io::IO) = begin

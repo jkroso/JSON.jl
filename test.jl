@@ -72,6 +72,12 @@ end
     @test parse_json("2.5E+3") ≈ 2.5e3
     @test parse_json("1e-2") ≈ 0.01
     @test parse_json("{\"v\":7.5e-7}")["v"] ≈ 7.5e-7
+    # Float64 precision — Float32 parsing corrupted these (47.849998…,
+    # cents lost above ~$131k, integer ids drifting above 2^24).
+    @test parse_json("47.85") == 47.85
+    @test parse_json("1234567.89") == 1234567.89
+    @test parse_json("16777217") == 16777217
+    @test parse_json("131072.01") == 131072.01
   end
 
   @testset "strings" begin
